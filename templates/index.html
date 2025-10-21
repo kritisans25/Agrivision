@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌱 AgriVision - Smart Crop & Fertilizer Recommendation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
+    :root {
+      --card-w: 420px;
+      --card-h: 420px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #040c2d, #27623a, #87bc8e);
+      color: #ffffff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #ffffff;
+      font-size: 2.5em;
+      margin-top: 40px;
+      text-shadow: 0 0 15px rgba(23, 171, 124, 0.6);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    h3 {
+      color: #e0f2f1;
+      font-weight: 600;
+      margin-bottom: 25px;
+      letter-spacing: 0.5px;
+    }
+
+    form {
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 25px 40px;
+      border-radius: 20px;
+      display: inline-block;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    form:hover { transform: scale(1.03); }
+
+    input, select {
+      width: 250px;
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    input::placeholder { color: #dcedc8; }
+
+    input:focus, select:focus {
+      background-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 10px #ff5252;
+    }
+
+    option { color: black; }
+
+    button {
+      background: linear-gradient(90deg, #ff5252, #ff1744);
+      color: white;
+      padding: 12px 26px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 800;
+      transition: 0.3s;
+      box-shadow: 0 6px 15px rgba(255, 82, 82, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #ff1744, #ff8a80);
+      box-shadow: 0 0 18px #ff5252;
+      transform: scale(1.07);
+    }
+
+    /* Flip Card */
+    .flip-card {
+      background-color: transparent;
+      width: var(--card-w);
+      height: var(--card-h);
+      margin: 40px auto;
+      perspective: 1000px;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 1s;
+    }
+
+    /* Auto flip to back */
+    .flip-card.show-back .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* After auto flip: hover returns to front */
+    .flip-card.show-back:hover .flip-card-inner.hover-enabled {
+      transform: rotateY(0deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .flip-card-back { transform: rotateY(180deg); }
+
+    /* Confidence Bar */
+    .bar-container {
+      position: relative;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      margin: 15px auto;
+      width: 80%;
+      height: 25px;
+      overflow: hidden;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    }
+
+    .bar {
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      width: 0%;
+      border-radius: 25px;
+      transition: width 1.3s ease-out;
+      box-shadow: 0 0 20px rgba(0, 255, 149, 0.5); /* Neon glow */
+    }
+
+    .bar-text {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: #ffffff;
+      pointer-events: none;
+    }
+
+    .confidence-label {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .tips-list {
+      font-size: 14px;
+      text-align: left;
+      max-height: 160px;
+      overflow: auto;
+      width: 85%;
+      padding-right: 6px;
+    }
+
+    .error {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255, 82, 82, 0.15);
+      box-shadow: 0 0 12px rgba(255, 82, 82, 0.25) inset;
+      color: #ffd4d4;
+      display: inline-block;
+    }
+
+    footer {
+      color: #c8e6c9;
+      margin-top: 40px;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      :root { --card-w: 90vw; --card-h: 440px; }
+      .bar-container { width: 88%; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌾 AgriVision</h1>
+  <h3>Smart Crop & Fertilizer Recommendation System</h3>
+
+  <form action="/predict" method="post">
+    <input type="text" name="city" placeholder="Enter your city" required><br />
+    <input type="number" name="N" placeholder="Nitrogen (N)" required><br />
+    <input type="number" name="P" placeholder="Phosphorus (P)" required><br />
+    <input type="number" name="K" placeholder="Potassium (K)" required><br />
+    <input type="number" step="0.1" name="ph" placeholder="pH value" required><br />
+
+    <select name="soil_type" required>
+      <option value="">Select Soil Type</option>
+      <option value="Sandy">Sandy</option>
+      <option value="Loamy">Loamy</option>
+      <option value="Clayey">Clayey</option>
+    </select><br />
+
+    <button type="submit">Predict</button>
+  </form>
+
+  {% if error %}
+  <div class="error">⚠️ {{ error }}</div>
+  {% endif %}
+
+  {% if crop and fertilizer %}
+  <div class="flip-card" id="resultCard">
+    <div class="flip-card-inner">
+      <!-- FRONT -->
+      <div class="flip-card-front">
+        <h2>{{ crop }}</h2>
+        <h3>{{ fertilizer }}</h3>
+
+        <div class="bar-container">
+          <div class="bar" id="confidence-bar"></div>
+          <div class="bar-text" id="bar-text">{{ confidence }}%</div>
+        </div>
+        <div id="confidence-label" class="confidence-label"></div>
+
+        <p style="margin-top:10px;">📍 {{ city }}</p>
+        <p>🌡 {{ temperature }}°C | 💧 {{ humidity }}% | 🌧 {{ rainfall }} mm</p>
+      </div>
+
+      <!-- BACK -->
+      <div class="flip-card-back">
+        <h3 style="color:#ffd54f;">Other Suitable Crops</h3>
+        <p><strong>{{ alt1 }}</strong> • <strong>{{ alt2 }}</strong></p>
+
+        {% if soil_tips %}
+        <h4 style="color:#ffca28;">Soil Optimization</h4>
+        <ul class="tips-list">
+          {% for tip in soil_tips %}
+          <li>{{ tip }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const confidence = parseFloat("{{ confidence }}");
+      const card = document.getElementById("resultCard");
+      const inner = card.querySelector(".flip-card-inner");
+      const bar = document.getElementById("confidence-bar");
+      const label = document.getElementById("confidence-label");
+      const barText = document.getElementById("bar-text");
+
+      const setConfidenceUI = (v) => {
+        const val = Math.max(0, Math.min(100, v));
+        bar.style.width = val + "%";
+        barText.textContent = val + "%";
+
+        let barColor, textLabel;
+        if (val >= 80) {
+          barColor = "linear-gradient(90deg, #00ff95, #00e676, #00c853)";
+          textLabel = "🟢 High Confidence";
+          bar.style.boxShadow = "0 0 25px rgba(0,255,149,0.7)";
+        } else if (val >= 50) {
+          barColor = "linear-gradient(90deg, #ffeb3b, #ffc107)";
+          textLabel = "🟡 Moderate Confidence";
+          bar.style.boxShadow = "0 0 25px rgba(255,215,0,0.7)";
+        } else {
+          barColor = "linear-gradient(90deg, #ff5252, #ff1744)";
+          textLabel = "🔴 Low Confidence";
+          bar.style.boxShadow = "0 0 25px rgba(255,50,50,0.6)";
+        }
+        bar.style.background = barColor;
+        label.textContent = textLabel;
+      };
+
+      window.addEventListener("load", () => {
+        setConfidenceUI(confidence);
+        setTimeout(() => {
+          card.classList.add("show-back");
+          inner.classList.add("hover-enabled");
+        }, 700);
+      });
+    })();
+  </script>
+  {% endif %}
+
+  <footer>© 2025 AgriVision | Empowering Smart Farming 🌱</footer>
+</body>
+</html>
