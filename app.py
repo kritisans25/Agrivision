@@ -3,9 +3,7 @@ import pickle, joblib, pandas as pd, requests
 
 app = Flask(__name__)
 
-# -----------------------------
-# 🌾 Load trained models & encoders
-# -----------------------------
+# Load trained models & encoders
 MODEL_DIR = "models/"
 
 xgb = joblib.load(f"{MODEL_DIR}crop_xgb.joblib")
@@ -16,13 +14,13 @@ le_soil = pickle.load(open(f"{MODEL_DIR}le_soil.pkl", "rb"))
 le_crop = pickle.load(open(f"{MODEL_DIR}le_crop.pkl", "rb"))
 le_fert = pickle.load(open(f"{MODEL_DIR}le_fert.pkl", "rb"))
 
-print("✅ Models and encoders loaded successfully!")
+print("Models and encoders loaded successfully!")
 
-# -----------------------------
-# 🌦 Weather API Function
-# -----------------------------
+
+#  Weather API Function
+
 def get_weather(city_name):
-    api_key = "c3ceb51fd78d5abddbf044e949db9337"  # your API key
+    api_key = "c3ceb51fd78d5abddbf044e949db9337" 
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     params = {"q": city_name, "appid": api_key, "units": "metric"}
 
@@ -98,9 +96,9 @@ def get_soil_tip(N, P, K, ph):
     return tips
 
 
-# -----------------------------
-# 🌍 Flask Routes
-# -----------------------------
+
+# Flask Routes
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -115,19 +113,19 @@ def predict():
         ph = float(request.form['ph'])
         soil_type = request.form['soil_type']
 
-        # Fetch live weather
+        
         weather = get_weather(city)
         if not weather:
             return render_template('index.html', error=f"⚠️ Weather data not found for {city}. Check spelling!")
 
         temperature, humidity, rainfall = weather
 
-        # ✅ Unpack all 5 values correctly
+       
         crop, fertilizer, confidence, alt1, alt2 = predict_crop_and_fertilizer(
             N, P, K, temperature, humidity, ph, rainfall, soil_type, city
         )
 
-        # ✅ Soil tips
+        
         soil_tips = get_soil_tip(N, P, K, ph)
 
         return render_template('index.html', crop=crop, fertilizer=fertilizer, city=city,

@@ -117,7 +117,7 @@
       transform: rotateY(180deg);
     }
 
-    /* After auto flip: hover returns to front */
+    
     .flip-card.show-back:hover .flip-card-inner.hover-enabled {
       transform: rotateY(0deg);
     }
@@ -160,7 +160,7 @@
       width: 0%;
       border-radius: 25px;
       transition: width 1.3s ease-out;
-      box-shadow: 0 0 20px rgba(0, 255, 149, 0.5); /* Neon glow */
+      box-shadow: 0 0 20px rgba(0, 255, 149, 0.5); 
     }
 
     .bar-text {
@@ -247,8 +247,9 @@
     <div class="flip-card-inner">
       <!-- FRONT -->
       <div class="flip-card-front">
-        <h2>{{ crop }}</h2>
-        <h3>{{ fertilizer }}</h3>
+        <h2>🌾CROP: {{ crop }}</h2>
+        <h3>💊 FERTILIZER: {{ fertilizer }}</h3>
+
 
         <div class="bar-container">
           <div class="bar" id="confidence-bar"></div>
