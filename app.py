@@ -103,8 +103,7 @@ def get_soil_tip(N, P, K, ph):
 def home():
     return render_template('index.html')
 
-from flask import redirect
-
+from flask import Flask, render_template, request, redirect
 @app.route('/predict', methods=['GET','POST'])
 def predict():
     if request.method == 'GET':
